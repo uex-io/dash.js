@@ -107,7 +107,7 @@ function MediaPlayer() {
     const context = this.context;
     const eventBus = EventBus(context).getInstance();
     let settings = Settings(context).getInstance();
-    const debug = Debug(context).getInstance();
+    const debug = Debug(context).getInstance({settings: settings});
 
     let instance,
         logger,
@@ -1373,13 +1373,12 @@ function MediaPlayer() {
 
     /**
      * This method allows to set media settings that will be used to pick the initial track. Format of the settings
-     * is following:
-     * {lang: langValue,
+     * is following: <br />
+     * {lang: langValue (can be either a string or a regex to match),
      *  viewpoint: viewpointValue,
      *  audioChannelConfiguration: audioChannelConfigurationValue,
      *  accessibility: accessibilityValue,
      *  role: roleValue}
-     *
      *
      * @param {string} type
      * @param {Object} value
@@ -1972,7 +1971,8 @@ function MediaPlayer() {
                 debug: debug,
                 initSegmentType: HTTPRequest.INIT_SEGMENT_TYPE,
                 BASE64: BASE64,
-                ISOBoxer: ISOBoxer
+                ISOBoxer: ISOBoxer,
+                settings: settings
             });
         }
     }
