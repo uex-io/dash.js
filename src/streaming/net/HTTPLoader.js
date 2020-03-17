@@ -212,11 +212,15 @@ function HTTPLoader(cfg) {
         const modifiedUrl = requestModifier.modifyRequestURL(request.url);
         const verb = request.checkExistenceOnly ? HTTPRequest.HEAD : HTTPRequest.GET;
         const withCredentials = mediaPlayerModel.getXHRWithCredentialsForType(request.type);
-
+        var timeout;
+        if (request.type == 'MediaSegment') {
+            timeout = request.duration * mediaPlayerModel.getSegmentTimeoutMultiplier() * 1000;
+        }
         httpRequest = {
             url: modifiedUrl,
             method: verb,
             withCredentials: withCredentials,
+            timeout: timeout,
             request: request,
             onload: onload,
             onend: onloadend,

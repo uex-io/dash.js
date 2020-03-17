@@ -40,7 +40,6 @@ function XHRLoader(cfg) {
 
     cfg = cfg || {};
     const requestModifier = cfg.requestModifier;
-
     let instance;
 
     function load(httpRequest) {
@@ -50,6 +49,11 @@ function XHRLoader(cfg) {
         const request = httpRequest.request;
 
         let xhr = new XMLHttpRequest();
+
+        if (httpRequest.timeout) {
+            xhr.timeout = httpRequest.timeout;
+        }
+
         xhr.open(httpRequest.method, httpRequest.url, true);
 
         if (request.responseType) {
@@ -75,7 +79,6 @@ function XHRLoader(cfg) {
         xhr.onerror = httpRequest.onerror;
         xhr.onprogress = httpRequest.progress;
         xhr.onabort = httpRequest.onabort;
-
         xhr.send();
 
         httpRequest.response = xhr;

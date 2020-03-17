@@ -133,6 +133,10 @@ function MediaPlayerModel() {
         return settings.get().streaming.lowLatencyEnabled ? settings.get().streaming.retryIntervals[type] / LOW_LATENCY_REDUCTION_FACTOR : settings.get().streaming.retryIntervals[type];
     }
 
+    function getSegmentTimeoutMultiplier() {
+        return settings.get().streaming.segmentTimeoutMultiplier;
+    }
+
     function getLiveDelay() {
         if (settings.get().streaming.lowLatencyEnabled) {
             return settings.get().streaming.liveDelay || DEFAULT_LOW_LATENCY_LIVE_DELAY;
@@ -211,6 +215,7 @@ function MediaPlayerModel() {
         setXHRWithCredentialsForType: setXHRWithCredentialsForType,
         getXHRWithCredentialsForType: getXHRWithCredentialsForType,
         getDefaultUtcTimingSource: getDefaultUtcTimingSource,
+        getSegmentTimeoutMultiplier: getSegmentTimeoutMultiplier,
         reset: reset
     };
 
