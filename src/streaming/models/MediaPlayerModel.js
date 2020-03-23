@@ -133,8 +133,12 @@ function MediaPlayerModel() {
         return settings.get().streaming.lowLatencyEnabled ? settings.get().streaming.retryIntervals[type] / LOW_LATENCY_REDUCTION_FACTOR : settings.get().streaming.retryIntervals[type];
     }
 
-    function getSegmentTimeoutMultiplier() {
-        return settings.get().streaming.segmentTimeoutMultiplier;
+    function getVodSegmentTimeoutMultiplier() {
+        return settings.get().streaming.vodSegmentTimeoutMultiplier;
+    }
+
+    function getLiveSegmentTimeoutMultiplier() {
+        return settings.get().streaming.liveSegmentTimeoutMultiplier;
     }
 
     function getLiveDelay() {
@@ -215,7 +219,8 @@ function MediaPlayerModel() {
         setXHRWithCredentialsForType: setXHRWithCredentialsForType,
         getXHRWithCredentialsForType: getXHRWithCredentialsForType,
         getDefaultUtcTimingSource: getDefaultUtcTimingSource,
-        getSegmentTimeoutMultiplier: getSegmentTimeoutMultiplier,
+        getVodSegmentTimeoutMultiplier: getVodSegmentTimeoutMultiplier,
+        getLiveSegmentTimeoutMultiplier: getLiveSegmentTimeoutMultiplier,
         reset: reset
     };
 

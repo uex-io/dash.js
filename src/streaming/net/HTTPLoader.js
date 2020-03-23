@@ -214,7 +214,11 @@ function HTTPLoader(cfg) {
         const withCredentials = mediaPlayerModel.getXHRWithCredentialsForType(request.type);
         var timeout;
         if (request.type == 'MediaSegment') {
-            timeout = request.duration * mediaPlayerModel.getSegmentTimeoutMultiplier() * 1000;
+            if (request.mediaInfo && isFinite(request.mediaInfo.streamInfo.duration)) {
+                timeout = request.duration * mediaPlayerModel.getVodSegmentTimeoutMultiplier() * 1000;
+            } else {
+                timeout = request.duration * mediaPlayerModel.getLiveSegmentTimeoutMultiplier() * 1000;
+            }
         }
         httpRequest = {
             url: modifiedUrl,

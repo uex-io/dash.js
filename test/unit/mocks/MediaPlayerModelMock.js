@@ -53,7 +53,8 @@ const XLINK_RETRY_INTERVAL = 500;
 const DEFAULT_XHR_WITH_CREDENTIALS = false;
 
 const MANIFEST_UPDATE_RETRY_INTERVAL = 100;
-const SEGMENT_TIMEOUT_MULTIPLYER = 1.5;
+const VOD_SEGMENT_TIMEOUT_MULTIPLIER = 5;
+const LIVE_SEGMENT_TIMEOUT_MULTIPLIER = 1.5;
 class MediaPlayerModelMock {
 
     // Constants
@@ -61,8 +62,12 @@ class MediaPlayerModelMock {
         return DEFAULT_UTC_TIMING_SOURCE;
     }
 
-    static get SEGMENT_TIMEOUT_MULTIPLYER() {
-        return SEGMENT_TIMEOUT_MULTIPLYER;
+    static get VOD_SEGMENT_TIMEOUT_MULTIPLIER() {
+        return VOD_SEGMENT_TIMEOUT_MULTIPLIER;
+    }
+
+    static get LIVE_SEGMENT_TIMEOUT_MULTIPLIER() {
+        return LIVE_SEGMENT_TIMEOUT_MULTIPLIER;
     }
 
     static get DEFAULT_MIN_BUFFER_TIME() {
@@ -126,7 +131,8 @@ class MediaPlayerModelMock {
         this.retryIntervals = {
             [HTTPRequest.MPD_TYPE]: MANIFEST_RETRY_INTERVAL, [HTTPRequest.XLINK_EXPANSION_TYPE]: XLINK_RETRY_INTERVAL, [HTTPRequest.MEDIA_SEGMENT_TYPE]: FRAGMENT_RETRY_INTERVAL, [HTTPRequest.INIT_SEGMENT_TYPE]: FRAGMENT_RETRY_INTERVAL, [HTTPRequest.BITSTREAM_SWITCHING_SEGMENT_TYPE]: FRAGMENT_RETRY_INTERVAL, [HTTPRequest.INDEX_SEGMENT_TYPE]: FRAGMENT_RETRY_INTERVAL, [HTTPRequest.OTHER_TYPE]: FRAGMENT_RETRY_INTERVAL
         };
-        this.segmentTimeoutMultiplyer = SEGMENT_TIMEOUT_MULTIPLYER;
+        this.VOD_SEGMENT_TIMEOUT_MULTIPLIER = VOD_SEGMENT_TIMEOUT_MULTIPLIER;
+        this.LIVE_SEGMENT_TIMEOUT_MULTIPLIER = LIVE_SEGMENT_TIMEOUT_MULTIPLIER;
     }
 
     //TODO Should we use Object.define to have setters/getters? makes more readable code on other side.
@@ -197,8 +203,12 @@ class MediaPlayerModelMock {
     getLiveDelay() {
         return this.liveDelay;
     }
-    getSegmentTimeoutMultiplier() {
-        return this.segmentTimeoutMultiplyer;
+    getVodSegmentTimeoutMultiplier() {
+        return this.VOD_SEGMENT_TIMEOUT_MULTIPLIER;
+    }
+
+    getLiveSegmentTimeoutMultiplier() {
+        return this.LIVE_SEGMENT_TIMEOUT_MULTIPLIER;
     }
 
     setUTCTimingSources(value) {

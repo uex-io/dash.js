@@ -79,7 +79,8 @@ import { HTTPRequest } from '../streaming/vo/metrics/HTTPRequest';
  *          lastBitrateCachingInfo: { enabled: true, ttl: 360000 },
  *          lastMediaSettingsCachingInfo: { enabled: true, ttl: 360000 },
  *          cacheLoadThresholds: { video: 50, audio: 5 },
- *          segmentTimeoutMultiplier: 1.5,
+ *          vodSegmentTimeoutMultiplier: 5,
+ *          liveSegmentTimeoutMultiplier: 1.5,
  *          retryIntervals: {
  *              MPD: 500,
  *              XLinkExpansion: 500,
@@ -381,7 +382,8 @@ function Settings() {
             lastBitrateCachingInfo: { enabled: true, ttl: 360000 },
             lastMediaSettingsCachingInfo: { enabled: true, ttl: 360000 },
             cacheLoadThresholds: { video: 50, audio: 5 },
-            segmentTimeoutMultiplier: 1.5,
+            vodSegmentTimeoutMultiplier: 5,
+            liveSegmentTimeoutMultiplier: 1.5,
             retryIntervals: {
                 [HTTPRequest.MPD_TYPE]: 500,
                 [HTTPRequest.XLINK_EXPANSION_TYPE]: 500,
