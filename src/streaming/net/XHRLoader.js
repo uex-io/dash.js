@@ -50,12 +50,12 @@ function XHRLoader(cfg) {
 
         let xhr = new XMLHttpRequest();
 
+        xhr.open(httpRequest.method, httpRequest.url, true);
+
         if (httpRequest.timeout) {
             xhr.timeout = httpRequest.timeout;
         }
-
-        xhr.open(httpRequest.method, httpRequest.url, true);
-
+        
         if (request.responseType) {
             xhr.responseType = request.responseType;
         }

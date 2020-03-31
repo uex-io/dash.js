@@ -219,6 +219,8 @@ function HTTPLoader(cfg) {
             } else {
                 timeout = request.duration * mediaPlayerModel.getLiveSegmentTimeoutMultiplier() * 1000;
             }
+        } else if (request.type == 'MPD') {
+            timeout = mediaPlayerModel.getMPDTimeout();
         }
         httpRequest = {
             url: modifiedUrl,
