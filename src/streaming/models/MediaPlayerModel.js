@@ -141,6 +141,10 @@ function MediaPlayerModel() {
         return settings.get().streaming.liveSegmentTimeoutMultiplier;
     }
 
+    function getMPDTimeout() {
+        return settings.get().streaming.mpdTimeout;
+    }
+
     function getLiveDelay() {
         if (settings.get().streaming.lowLatencyEnabled) {
             return settings.get().streaming.liveDelay || DEFAULT_LOW_LATENCY_LIVE_DELAY;
@@ -221,6 +225,7 @@ function MediaPlayerModel() {
         getDefaultUtcTimingSource: getDefaultUtcTimingSource,
         getVodSegmentTimeoutMultiplier: getVodSegmentTimeoutMultiplier,
         getLiveSegmentTimeoutMultiplier: getLiveSegmentTimeoutMultiplier,
+        getMPDTimeout: getMPDTimeout,
         reset: reset
     };
 

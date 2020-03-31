@@ -81,6 +81,7 @@ import { HTTPRequest } from '../streaming/vo/metrics/HTTPRequest';
  *          cacheLoadThresholds: { video: 50, audio: 5 },
  *          vodSegmentTimeoutMultiplier: 5,
  *          liveSegmentTimeoutMultiplier: 1.5,
+ *          mpdTimeout: 3000,
  *          retryIntervals: {
  *              MPD: 500,
  *              XLinkExpansion: 500,
@@ -309,6 +310,10 @@ import { HTTPRequest } from '../streaming/vo/metrics/HTTPRequest';
  * @property {module:Settings~AudioVideoSettings} [cacheLoadThresholds={video: 50, audio: 5}]
  * For a given media type, the threshold which defines if the response to a fragment
  * request is coming from browser cache or not.
+ *
+ * @property {number} [vodSegmentTimeoutMultiplier=5] The segment timeout multiplier for VOD playback. Defaults to 5 times the segment duration
+ * @property {number} [bufferTimeAtTopQuliveSegmentTimeoutMultiplieralityLongForm=1.5] The segment timeout multiplier for Live playback. Defaults to 1.5 times the segment duration.
+ * @property {number} [mpdTimeout=3000] The MPD network timeout in milliseconds. Defaults to 3000 ms.
  * @property {module:Settings~RequestTypeSettings} [retryIntervals] Time in milliseconds of which to reload a failed file load attempt.
  * @property {module:Settings~RequestTypeSettings} [retryAttempts] Total number of retry attempts that will occur on a file load before it fails.
  * @property {module:Settings~AbrSettings} abr Adaptive Bitrate algorithm related settings.
@@ -384,6 +389,7 @@ function Settings() {
             cacheLoadThresholds: { video: 50, audio: 5 },
             vodSegmentTimeoutMultiplier: 5,
             liveSegmentTimeoutMultiplier: 1.5,
+            mpdTimeout: 3000,
             retryIntervals: {
                 [HTTPRequest.MPD_TYPE]: 500,
                 [HTTPRequest.XLINK_EXPANSION_TYPE]: 500,
