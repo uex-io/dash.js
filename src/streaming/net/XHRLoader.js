@@ -55,7 +55,7 @@ function XHRLoader(cfg) {
         if (httpRequest.timeout) {
             xhr.timeout = httpRequest.timeout;
         }
-        
+
         if (request.responseType) {
             xhr.responseType = request.responseType;
         }
