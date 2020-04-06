@@ -16152,6 +16152,9 @@ var _streamingVoMetricsHTTPRequest = _dereq_(240);
  *          lastBitrateCachingInfo: { enabled: true, ttl: 360000 },
  *          lastMediaSettingsCachingInfo: { enabled: true, ttl: 360000 },
  *          cacheLoadThresholds: { video: 50, audio: 5 },
+ *          vodSegmentTimeoutMultiplier: 5,
+ *          liveSegmentTimeoutMultiplier: 1.5,
+ *          mpdTimeout: 3000,
  *          retryIntervals: {
  *              MPD: 500,
  *              XLinkExpansion: 500,
@@ -16387,6 +16390,10 @@ var _streamingVoMetricsHTTPRequest = _dereq_(240);
  * @property {module:Settings~AudioVideoSettings} [cacheLoadThresholds={video: 50, audio: 5}]
  * For a given media type, the threshold which defines if the response to a fragment
  * request is coming from browser cache or not.
+ *
+ * @property {number} [vodSegmentTimeoutMultiplier=5] The segment timeout multiplier for VOD playback. Defaults to 5 times the segment duration
+ * @property {number} [bufferTimeAtTopQuliveSegmentTimeoutMultiplieralityLongForm=1.5] The segment timeout multiplier for Live playback. Defaults to 1.5 times the segment duration.
+ * @property {number} [mpdTimeout=3000] The MPD network timeout in milliseconds. Defaults to 3000 ms.
  * @property {module:Settings~RequestTypeSettings} [retryIntervals] Time in milliseconds of which to reload a failed file load attempt.
  * @property {module:Settings~RequestTypeSettings} [retryAttempts] Total number of retry attempts that will occur on a file load before it fails.
  * @property {module:Settings~AbrSettings} abr Adaptive Bitrate algorithm related settings.
@@ -16471,6 +16478,9 @@ function Settings() {
             lastBitrateCachingInfo: { enabled: true, ttl: 360000 },
             lastMediaSettingsCachingInfo: { enabled: true, ttl: 360000 },
             cacheLoadThresholds: { video: 50, audio: 5 },
+            vodSegmentTimeoutMultiplier: 5,
+            liveSegmentTimeoutMultiplier: 1.5,
+            mpdTimeout: 3000,
             retryIntervals: (_retryIntervals = {}, _defineProperty(_retryIntervals, _streamingVoMetricsHTTPRequest.HTTPRequest.MPD_TYPE, 500), _defineProperty(_retryIntervals, _streamingVoMetricsHTTPRequest.HTTPRequest.XLINK_EXPANSION_TYPE, 500), _defineProperty(_retryIntervals, _streamingVoMetricsHTTPRequest.HTTPRequest.MEDIA_SEGMENT_TYPE, 1000), _defineProperty(_retryIntervals, _streamingVoMetricsHTTPRequest.HTTPRequest.INIT_SEGMENT_TYPE, 1000), _defineProperty(_retryIntervals, _streamingVoMetricsHTTPRequest.HTTPRequest.BITSTREAM_SWITCHING_SEGMENT_TYPE, 1000), _defineProperty(_retryIntervals, _streamingVoMetricsHTTPRequest.HTTPRequest.INDEX_SEGMENT_TYPE, 1000), _defineProperty(_retryIntervals, _streamingVoMetricsHTTPRequest.HTTPRequest.OTHER_TYPE, 1000), _retryIntervals),
             retryAttempts: (_retryAttempts = {}, _defineProperty(_retryAttempts, _streamingVoMetricsHTTPRequest.HTTPRequest.MPD_TYPE, 3), _defineProperty(_retryAttempts, _streamingVoMetricsHTTPRequest.HTTPRequest.XLINK_EXPANSION_TYPE, 1), _defineProperty(_retryAttempts, _streamingVoMetricsHTTPRequest.HTTPRequest.MEDIA_SEGMENT_TYPE, 3), _defineProperty(_retryAttempts, _streamingVoMetricsHTTPRequest.HTTPRequest.INIT_SEGMENT_TYPE, 3), _defineProperty(_retryAttempts, _streamingVoMetricsHTTPRequest.HTTPRequest.BITSTREAM_SWITCHING_SEGMENT_TYPE, 3), _defineProperty(_retryAttempts, _streamingVoMetricsHTTPRequest.HTTPRequest.INDEX_SEGMENT_TYPE, 3), _defineProperty(_retryAttempts, _streamingVoMetricsHTTPRequest.HTTPRequest.OTHER_TYPE, 3), _retryAttempts),
             abr: {
@@ -41211,6 +41221,18 @@ function MediaPlayerModel() {
         return settings.get().streaming.lowLatencyEnabled ? settings.get().streaming.retryIntervals[type] / LOW_LATENCY_REDUCTION_FACTOR : settings.get().streaming.retryIntervals[type];
     }
 
+    function getVodSegmentTimeoutMultiplier() {
+        return settings.get().streaming.vodSegmentTimeoutMultiplier;
+    }
+
+    function getLiveSegmentTimeoutMultiplier() {
+        return settings.get().streaming.liveSegmentTimeoutMultiplier;
+    }
+
+    function getMPDTimeout() {
+        return settings.get().streaming.mpdTimeout;
+    }
+
     function getLiveDelay() {
         if (settings.get().streaming.lowLatencyEnabled) {
             return settings.get().streaming.liveDelay || DEFAULT_LOW_LATENCY_LIVE_DELAY;
@@ -41289,6 +41311,9 @@ function MediaPlayerModel() {
         setXHRWithCredentialsForType: setXHRWithCredentialsForType,
         getXHRWithCredentialsForType: getXHRWithCredentialsForType,
         getDefaultUtcTimingSource: getDefaultUtcTimingSource,
+        getVodSegmentTimeoutMultiplier: getVodSegmentTimeoutMultiplier,
+        getLiveSegmentTimeoutMultiplier: getLiveSegmentTimeoutMultiplier,
+        getMPDTimeout: getMPDTimeout,
         reset: reset
     };
 
@@ -42872,11 +42897,21 @@ function HTTPLoader(cfg) {
         modifiedUrl = _coreUtils2['default'].addAditionalQueryParameterToUrl(modifiedUrl, additionalQueryParameter);
         var verb = request.checkExistenceOnly ? _voMetricsHTTPRequest.HTTPRequest.HEAD : _voMetricsHTTPRequest.HTTPRequest.GET;
         var withCredentials = mediaPlayerModel.getXHRWithCredentialsForType(request.type);
-
+        var timeout;
+        if (request.type == 'MediaSegment') {
+            if (request.mediaInfo && isFinite(request.mediaInfo.streamInfo.duration)) {
+                timeout = request.duration * mediaPlayerModel.getVodSegmentTimeoutMultiplier() * 1000;
+            } else {
+                timeout = request.duration * mediaPlayerModel.getLiveSegmentTimeoutMultiplier() * 1000;
+            }
+        } else if (request.type == 'MPD') {
+            timeout = mediaPlayerModel.getMPDTimeout();
+        }
         httpRequest = {
             url: modifiedUrl,
             method: verb,
             withCredentials: withCredentials,
+            timeout: timeout,
             request: request,
             onload: onload,
             onend: onloadend,
@@ -43046,7 +43081,6 @@ function XHRLoader(cfg) {
 
     cfg = cfg || {};
     var requestModifier = cfg.requestModifier;
-
     var instance = undefined;
 
     function load(httpRequest) {
@@ -43056,7 +43090,12 @@ function XHRLoader(cfg) {
         var request = httpRequest.request;
 
         var xhr = new XMLHttpRequest();
+
         xhr.open(httpRequest.method, httpRequest.url, true);
+
+        if (httpRequest.timeout) {
+            xhr.timeout = httpRequest.timeout;
+        }
 
         if (request.responseType) {
             xhr.responseType = request.responseType;
@@ -43081,7 +43120,6 @@ function XHRLoader(cfg) {
         xhr.onerror = httpRequest.onerror;
         xhr.onprogress = httpRequest.progress;
         xhr.onabort = httpRequest.onabort;
-
         xhr.send();
 
         httpRequest.response = xhr;
