@@ -28414,7 +28414,7 @@ function SourceBufferSink(mediaSource, mediaInfo, onAppendedCallback, useAppendW
             try {
                 buffer.appendWindowEnd = Infinity;
             } catch (e) {
-                logger.error('Failed to extend buffer appendWindowEnd.');
+                logger.warn('Failed to extend buffer appendWindowEnd.');
             }
             if (!keepBuffer) {
                 try {
@@ -28422,7 +28422,7 @@ function SourceBufferSink(mediaSource, mediaInfo, onAppendedCallback, useAppendW
                         mediaSource.removeSourceBuffer(buffer);
                     }
                 } catch (e) {
-                    logger.error('Failed to remove source buffer from media source.');
+                    logger.warn('Failed to remove source buffer from media source.');
                 }
                 buffer = null;
             }
