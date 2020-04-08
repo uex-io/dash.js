@@ -28634,7 +28634,11 @@ function SourceBufferSink(mediaSource, mediaInfo, onAppendedCallback, useAppendW
                 buffer.removeEventListener('abort', errHandler, false);
             }
             clearInterval(intervalId);
-            buffer.appendWindowEnd = Infinity;
+            try {
+                buffer.appendWindowEnd = Infinity;
+            } catch (e) {
+                logger.error('Failed to extend buffer appendWindowEnd.');
+            }
             if (!keepBuffer) {
                 try {
                     if (!buffer.getClassName || buffer.getClassName() !== 'TextSourceBuffer') {
